@@ -23,6 +23,25 @@ jobs:
         website: oracle.com
         release: 21
 
+    - name: 'Download JT Harness artifacts'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        JTHARNESS_RELEASE_TAG=$(gh api repos/JetBrains/jtharness/releases/latest --jq '.tag_name')
+        DOWNLOAD_DIR="${RUNNER_TEMP}/jtharness"
+        mkdir -p "${DOWNLOAD_DIR}"
+        gh release download "${JTHARNESS_RELEASE_TAG}" \
+          --repo JetBrains/jtharness \
+          --pattern 'javatest.jar' \
+          --pattern 'LICENSE' \
+          --pattern 'copyright.txt' \
+          --dir "${DOWNLOAD_DIR}"
+        echo "JTHARNESS_SRC_VERSION=${JTHARNESS_RELEASE_TAG}" >> $GITHUB_ENV
+        echo "JTHARNESS_JAVATEST_JAR=${DOWNLOAD_DIR}/javatest.jar" >> $GITHUB_ENV
+        echo "JTHARNESS_LICENSE=${DOWNLOAD_DIR}/LICENSE" >> $GITHUB_ENV
+        echo "JTHARNESS_COPYRIGHT=${DOWNLOAD_DIR}/copyright.txt" >> $GITHUB_ENV
+
     - name: 'Build JTReg'
       shell: bash
       run: |
