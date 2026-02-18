@@ -3,8 +3,8 @@ name: Build and Test JTReg
 on:
   push:
     branches-ignore:
-      - master
       - pr/*
+  workflow_dispatch:
 
 jobs:
 
