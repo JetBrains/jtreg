@@ -64,6 +64,12 @@ jobs:
       run: |
         bash make/build.sh --skip-download
 
+    - name: 'Upload build artifact'
+      uses: actions/upload-artifact@v4
+      with:
+        name: jtreg-build
+        path: build/images/jtreg.zip
+
   freebsd-x64:
     runs-on: ubuntu-latest
 
@@ -92,3 +98,19 @@ jobs:
             su action -c 'git config --global --add safe.directory $(pwd)'
             su action -c 'bash make/build.sh --jdk /usr/local/openjdk21'
             su action -c 'bash build/make.sh test'
+
+  publish:
+    needs: [linux-x64, freebsd-x64]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 'Download build artifact'
+      uses: actions/download-artifact@v4
+      with:
+        name: jtreg-build
+
+    - name: 'Publish jtreg.zip'
+      uses: actions/upload-artifact@v4
+      with:
+        name: jtreg
+        path: jtreg.zip
